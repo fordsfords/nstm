@@ -35,17 +35,19 @@
 } while (0)
 
 
-nstm_t *nstm_create()
+nstm_t *nstm_create(clockid_t clk_id)
 {
   kern_return_t kstat;
   nstm_t *nstm = (nstm_t *)malloc(sizeof(nstm_t));
   ASSRT(nstm != NULL);
 
+  nstm->clk_id = clk_id;
+
 #ifdef __MACH__
-  nstm->start_ns = clock_gettime_nsec_np(CLOCK_MONOTONIC);
+  nstm->start_ns = clock_gettime_nsec_np(clk_id);
   nstm->cur_ns = nstm->start_ns;
 #else
-  clock_gettime(CLOCK_MONOTONIC, &nstm->start_ts);
+  clock_gettime(clk_id, &nstm->start_ts);
   nstm->cur_ns = nstm->start_ts.tv_nsec;
 #endif
 
@@ -62,12 +64,12 @@ void nstm_delete(nstm_t *nstm)
 uint64_t nstm_get(nstm_t *nstm)
 {
 #ifdef __MACH__
-  nstm->start_ns = clock_gettime_nsec_np(CLOCK_MONOTONIC);
+  nstm->cur_ns = clock_gettime_nsec_np(nstm->clk_id);
 #else
-  clock_gettime(CLOCK_MONOTONIC, &nstm->cur_ts);
+  clock_gettime(nstm->clk_id, &nstm->cur_ts);
   nstm->cur_ns = (uint64_t)(nstm->cur_ts.tv_sec - nstm->start_ts.tv_sec)
       * UINT64_C(1000000000) + (uint64_t)nstm->cur_ts.tv_nsec;
 #endif
 
-  return nstm->cur_ns - nstm->start_ns;
+  return nstm->cur_ns;
 }  /* nstm_get */

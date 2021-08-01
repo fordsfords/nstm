@@ -1,8 +1,16 @@
 # nstm
-C module to simplify making nanosecond-level timings.
+C module to simplify making nanosecond-level timings. Portable across
+Linux and Mac.
 
 
 ## Usage
+
+
+## Notes
+
+On my MacBook Air (Intel, 1.6 GHz, from early 2015):
+* The resolution is microsecond (nanos are always 0).
+* One call to nstm_get() takes about 87 nanoseconds (averaged over 1M calls).
 
 
 ## License

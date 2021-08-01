@@ -26,16 +26,17 @@ extern "C" {
 #endif
 
 struct nstm_s {
+  clockid_t clk_id;
+  uint64_t start_ns;
+  uint64_t cur_ns;
 #ifndef __MACH__
   struct timespec start_ts;
   struct timespec cur_ts;
 #endif
-  uint64_t start_ns;
-  uint64_t cur_ns;
 };
 typedef struct nstm_s nstm_t;
 
-nstm_t *nstm_create();
+nstm_t *nstm_create(clockid_t clk_id);
 void nstm_delete(nstm_t *nstm);
 uint64_t nstm_get(nstm_t *nstm);
 
