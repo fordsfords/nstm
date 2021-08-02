@@ -31,26 +31,30 @@ extern "C" {
 /* Linux */
 #endif
 
-#define NSTM_CLOCKID_BEST -1
+#define NSTM_CLOCK_MONOTONIC 1
+#define NSTM_CLOCK_MONOTONIC_RAW 2
+#define NSTM_CLOCK_REALTIME 3
+#define NSTM_CLOCK_BEST -1
 
 struct nstm_s {
-  clockid_t clk_id;
   uint64_t start_ns;
   uint64_t cur_ns;
 #ifdef __MACH__
   /* Mac */
+  clockid_t clockid;
 #elif defined(_WIN32)
   /* Windows */
   LARGE_INTEGER start_ticks;
   LARGE_INTEGER frequency;
 #else
   /* Linux */
+  clockid_t clockid;
   struct timespec start_ts;
 #endif
 };
 typedef struct nstm_s nstm_t;
 
-nstm_t *nstm_create(clockid_t clk_id);
+nstm_t *nstm_create(int clockid);
 void nstm_delete(nstm_t *nstm);
 uint64_t nstm_get(nstm_t *nstm);
 

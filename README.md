@@ -1,16 +1,42 @@
 # nstm
 C module to simplify making nanosecond-level timings. Portable across
-Linux and Mac.
+Linux, Mac, and Windows.
 
 
 ## Usage
 
+````
+#include "nstm.h"
+...
+  nstm_t *nstm = nstm_create(NSTM_CLOCKID_BEST);
+  uint64_t t1, t2;
+...
+  t1 = nstm_get(nstm);
+... code to be timed
+  t2 = nstm_get(nstm);
+
+  printf("Duration = %"PRIu64"\n", t2 - t1);
+````
+
+
+## nstm_test.c
+
+nstm_test.c is a test program that exercises the nstm module and also
+measures the execution time of a few interesting things (like nstm itself).
+Look at the code for details.
+
+
+## Portability
+
+I use "Sleep()" to sleep for milliseconds (and on Mac/Linux define it
+in terms of "usleep()").
+
+I use "uint64_t" and define it on Windows in terms of "unsigned __int64".
+
 
 ## Notes
 
-On my MacBook Air (Intel, 1.6 GHz, from early 2015):
-* The resolution is microsecond (nanos are always 0).
-* One call to nstm_get() takes about 87 nanoseconds (averaged over 1M calls).
+See https://github.com/fordsfords/fordsfords.github.io/wiki/Timing-software
 
 
 ## License

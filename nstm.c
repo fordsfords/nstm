@@ -23,19 +23,7 @@
 #elif defined(_WIN32)
 /* Windows */
 #include <windows.h>
-/*typedef __int8 int8_t; */
-typedef signed char int8_t;
-typedef unsigned __int8 uint8_t;
-typedef __int16 int16_t;
-typedef unsigned __int16 uint16_t;
-typedef __int32 int32_t;
-typedef unsigned __int32 uint32_t;
-typedef __int64 int64_t;
 typedef unsigned __int64 uint64_t;
-typedef int clockid_t;
-#define CLOCK_MONOTONIC 1
-#define CLOCK_MONOTONIC_RAW 2
-#define CLOCK_REALTIME 3
 #else
 /* Linux */
 #endif
@@ -54,31 +42,55 @@ typedef int clockid_t;
 } while (0)
 
 
-nstm_t *nstm_create(clockid_t clk_id)
+nstm_t *nstm_create(int clockid)
 {
   nstm_t *nstm = (nstm_t *)malloc(sizeof(nstm_t));
   ASSRT(nstm != NULL);
 
-  nstm->clk_id = clk_id;
-
 #ifdef __MACH__
   /* Mac */
-  nstm->start_ns = clock_gettime_nsec_np(clk_id);
-  nstm->cur_ns = nstm->start_ns;
-  if (clk_id == NSTM_CLOCKID_BEST) {
-    nstm->clk_id = CLOCK_MONOTONIC_RAW;
+  switch (clockid) {
+    case NSTM_CLOCK_MONOTONIC:
+      nstm->clockid = CLOCK_MONOTONIC;
+      break;
+    case NSTM_CLOCK_MONOTONIC_RAW:
+      nstm->clockid = CLOCK_MONOTONIC_RAW;
+      break;
+    case NSTM_CLOCK_REALTIME:
+      nstm->clockid = CLOCK_REALTIME;
+      break;
+    case NSTM_CLOCK_BEST:
+      nstm->clockid = CLOCK_MONOTONIC_RAW;
+      break;
+    default:
+      nstm->clockid = CLOCK_MONOTONIC_RAW;
   }
+  nstm->start_ns = clock_gettime_nsec_np(nstm->clockid);
+  nstm->cur_ns = nstm->start_ns;
 #elif defined(_WIN32)
   /* Windows */
   QueryPerformanceFrequency(&nstm->frequency);
   QueryPerformanceCounter(&nstm->start_ticks);
 #else
   /* Linux */
-  clock_gettime(clk_id, &nstm->start_ts);
-  nstm->cur_ns = nstm->start_ts.tv_nsec;
-  if (clk_id == NSTM_CLOCKID_BEST) {
-    nstm->clk_id = CLOCK_MONOTONIC;
+  switch (clockid) {
+    case NSTM_CLOCK_MONOTONIC:
+      nstm->clockid = CLOCK_MONOTONIC;
+      break;
+    case NSTM_CLOCK_MONOTONIC_RAW:
+      nstm->clockid = CLOCK_MONOTONIC_RAW;
+      break;
+    case NSTM_CLOCK_REALTIME:
+      nstm->clockid = CLOCK_REALTIME;
+      break;
+    case NSTM_CLOCK_BEST:
+      nstm->clockid = CLOCK_MONOTONIC_RAW;
+      break;
+    default:
+      nstm->clockid = CLOCK_MONOTONIC;
   }
+  clock_gettime(nstm->clockid, &nstm->start_ts);
+  nstm->cur_ns = nstm->start_ts.tv_nsec;
 #endif
 
   return nstm;
@@ -94,7 +106,7 @@ void nstm_delete(nstm_t *nstm)
 uint64_t nstm_get(nstm_t *nstm)
 {
 #ifdef __MACH__
-  nstm->cur_ns = clock_gettime_nsec_np(nstm->clk_id);
+  nstm->cur_ns = clock_gettime_nsec_np(nstm->clockid);
 #elif defined(_WIN32)
   {
     LARGE_INTEGER ticks;
@@ -107,7 +119,7 @@ uint64_t nstm_get(nstm_t *nstm)
 #else
   {
     struct timespec cur_ts;
-    clock_gettime(nstm->clk_id, &cur_ts);
+    clock_gettime(nstm->clockid, &cur_ts);
     nstm->cur_ns = (uint64_t)(cur_ts.tv_sec - nstm->start_ts.tv_sec)
         * UINT64_C(1000000000) + (uint64_t)cur_ts.tv_nsec;
   }

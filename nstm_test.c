@@ -21,26 +21,12 @@
 #elif defined(_WIN32)
 /* Windows */
 #include <windows.h>
-/*typedef __int8 int8_t; */
-typedef signed char int8_t;
-typedef unsigned __int8 uint8_t;
-typedef __int16 int16_t;
-typedef unsigned __int16 uint16_t;
-typedef __int32 int32_t;
-typedef unsigned __int32 uint32_t;
-typedef __int64 int64_t;
 typedef unsigned __int64 uint64_t;
-typedef int clockid_t;
-#define CLOCK_MONOTONIC 1
-#define CLOCK_MONOTONIC_RAW 2
-#define CLOCK_REALTIME 3
 #else
 /* Linux */
 #include <unistd.h>
 #define Sleep(ms) usleep((ms)*1000)
 #endif
-
-#include "nstm.h"
 
 #include "nstm.h"
 
@@ -58,10 +44,10 @@ int main(int argc, char **argv)
   uint64_t t1_raw, t2_raw, t3_raw, t4_raw, t5_raw, t6_raw, t7_raw;
   uint64_t t1_rt, t2_rt, t3_rt, t4_rt, t5_rt, t6_rt, t7_rt;
 
-  nstm = nstm_create(CLOCK_MONOTONIC);
-  nstm_raw = nstm_create(CLOCK_MONOTONIC_RAW);
-  nstm_rt = nstm_create(CLOCK_REALTIME);
-  nstm_best = nstm_create(NSTM_CLOCKID_BEST);
+  nstm = nstm_create(NSTM_CLOCK_MONOTONIC);
+  nstm_raw = nstm_create(NSTM_CLOCK_MONOTONIC_RAW);
+  nstm_rt = nstm_create(NSTM_CLOCK_REALTIME);
+  nstm_best = nstm_create(NSTM_CLOCK_BEST);
   t1 = nstm_get(nstm);
   t1_raw = nstm_get(nstm_raw);
   t1_rt = nstm_get(nstm_rt);
