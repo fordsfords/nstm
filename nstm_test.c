@@ -11,9 +11,13 @@
 # is https://github.com/fordsfords/nstm
 */
 
+#include <stdio.h>
+#include <inttypes.h>
+
 #ifdef __MACH__
 /* Mac */
 #include <unistd.h>
+#define Sleep(ms) usleep((ms)*1000)
 #elif defined(_WIN32)
 /* Windows */
 #include <windows.h>
@@ -26,13 +30,17 @@ typedef __int32 int32_t;
 typedef unsigned __int32 uint32_t;
 typedef __int64 int64_t;
 typedef unsigned __int64 uint64_t;
-#include "nstm.h"
+typedef int clockid_t;
+#define CLOCK_MONOTONIC 1
+#define CLOCK_MONOTONIC_RAW 2
+#define CLOCK_REALTIME 3
 #else
 /* Linux */
 #include <unistd.h>
+#define Sleep(ms) usleep((ms)*1000)
 #endif
-#include <stdio.h>
-#include <inttypes.h>
+
+#include "nstm.h"
 
 #define M 10
 #define N (M*1000000)
@@ -56,7 +64,7 @@ int main(int argc, char **argv)
   t1_raw = nstm_get(nstm_raw);
   t1_rt = nstm_get(nstm_rt);
 
-  usleep(100);
+  Sleep(1);
   t2 = nstm_get(nstm);
   t2_raw = nstm_get(nstm_raw);
   t2_rt = nstm_get(nstm_rt);
@@ -107,7 +115,7 @@ int main(int argc, char **argv)
 #endif
 
   printf("t1==%"PRIu64"\n", t1);
-  printf("usleep(100)=%"PRIu64", raw=%"PRIu64", rt=%"PRIu64"\n",
+  printf("Sleep(1)=%"PRIu64", raw=%"PRIu64", rt=%"PRIu64"\n",
       t2-t1, t2_raw-t1_raw, t2_rt-t1_rt);
   printf("null=%"PRIu64", raw=%"PRIu64", rt=%"PRIu64"\n",
       t3-t2, t3_raw-t2_raw, t3_rt-t2_rt);

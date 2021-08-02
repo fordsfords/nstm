@@ -41,7 +41,7 @@ struct nstm_s {
   /* Mac */
 #elif defined(_WIN32)
   /* Windows */
-  uint64_t start_ticks;
+  LARGE_INTEGER start_ticks;
   LARGE_INTEGER frequency;
 #else
   /* Linux */

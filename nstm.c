@@ -20,7 +20,6 @@
 /* Mac */
 #include <mach/mach.h>
 #include <mach/mach_time.h>
-#define Sleep(ms) usleep((ms)*1000)
 #elif defined(_WIN32)
 /* Windows */
 #include <windows.h>
@@ -39,7 +38,6 @@ typedef int clockid_t;
 #define CLOCK_REALTIME 3
 #else
 /* Linux */
-#define Sleep(ms) usleep((ms)*1000)
 #endif
 
 #include "nstm.h"
@@ -102,7 +100,7 @@ uint64_t nstm_get(nstm_t *nstm)
     LARGE_INTEGER ticks;
     QueryPerformanceCounter(&ticks);
     nstm->cur_ns = ticks.QuadPart;
-    nstm->cur_ns -= nstm->start_ticks;
+    nstm->cur_ns -= nstm->start_ticks.QuadPart;
     nstm->cur_ns *= 1000000000;
     nstm->cur_ns /= nstm->frequency.QuadPart;
   }
