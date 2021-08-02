@@ -23,14 +23,16 @@ int main(int argc, char **argv)
   nstm_t *nstm;
   nstm_t *nstm_raw;
   nstm_t *nstm_rt;
+  nstm_t *nstm_best;
   int i;
-  uint64_t t1, t2, t3, t4, t5, t6, t_ignore;
-  uint64_t t1_raw, t2_raw, t3_raw, t4_raw, t5_raw, t6_raw;
-  uint64_t t1_rt, t2_rt, t3_rt, t4_rt, t5_rt, t6_rt;
+  uint64_t t1, t2, t3, t4, t5, t6, t7, t_ignore;
+  uint64_t t1_raw, t2_raw, t3_raw, t4_raw, t5_raw, t6_raw, t7_raw;
+  uint64_t t1_rt, t2_rt, t3_rt, t4_rt, t5_rt, t6_rt, t7_rt;
 
   nstm = nstm_create(CLOCK_MONOTONIC);
   nstm_raw = nstm_create(CLOCK_MONOTONIC_RAW);
   nstm_rt = nstm_create(CLOCK_REALTIME);
+  nstm_best = nstm_create(NSTM_CLOCKID_BEST);
   t1 = nstm_get(nstm);
   t1_raw = nstm_get(nstm_raw);
   t1_rt = nstm_get(nstm_rt);
@@ -65,13 +67,24 @@ int main(int argc, char **argv)
   t6_raw = nstm_get(nstm_raw);
   t6_rt = nstm_get(nstm_rt);
 
+  for (i = 0; i < N; i++) {
+    t_ignore = nstm_get(nstm_best);
+  }
+  t7 = nstm_get(nstm);
+  t7_raw = nstm_get(nstm_raw);
+  t7_rt = nstm_get(nstm_rt);
+
 /* Print some internal fields. */
 #ifdef __MACH__
   printf("start_ns=%"PRIu64"\n", nstm->start_ns);
 
+#elif defined(_WIN32)
+  printf("frequency=%"PRIu64", start_ticks=%"PRIu64"\n",
+      nstm->frequency, nstm->start_ticks);
+
 #else
   printf("start_ns=%"PRIu64", start_ts.tv_sec=%jd\n",
-      nstm->start_ns, (intmax_t)nstm->tart_ts.tv_sec);
+      nstm->start_ns, (intmax_t)nstm->start_ts.tv_sec);
 #endif
 
   printf("t1==%"PRIu64"\n", t1);
@@ -85,6 +98,8 @@ int main(int argc, char **argv)
       M, t5-t4, t5_raw-t4_raw, t5_rt-t4_rt);
   printf("%dM nstm_get rt calls=%"PRIu64", raw=%"PRIu64", rt=%"PRIu64"\n",
       M, t6-t5, t6_raw-t5_raw, t6_rt-t5_rt);
+  printf("%dM nstm_get best calls=%"PRIu64", raw=%"PRIu64", rt=%"PRIu64"\n",
+      M, t7-t6, t7_raw-t6_raw, t7_rt-t6_rt);
 
   nstm_delete(nstm);
   nstm_delete(nstm_raw);

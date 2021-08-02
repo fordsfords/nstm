@@ -25,13 +25,21 @@ extern "C" {
 #include <mach/mach.h>
 #endif
 
+#define NSTM_CLOCKID_BEST -1
+
 struct nstm_s {
   clockid_t clk_id;
   uint64_t start_ns;
   uint64_t cur_ns;
-#ifndef __MACH__
+#ifdef __MACH__
+  /* Mac */
+#elif defined(_WIN32)
+  /* Windows */
+  uint64_t start_ticks;
+  LARGE_INTEGER frequency;
+#else
+  /* Linux */
   struct timespec start_ts;
-  struct timespec cur_ts;
 #endif
 };
 typedef struct nstm_s nstm_t;

@@ -19,6 +19,17 @@
 #ifdef __MACH__
 #include <mach/mach.h>
 #include <mach/mach_time.h>
+#elif defined(_WIN32)
+#include <windows.h>
+/*typedef __int8 int8_t; */
+typedef signed char int8_t;
+typedef unsigned __int8 uint8_t;
+typedef __int16 int16_t;
+typedef unsigned __int16 uint16_t;
+typedef __int32 int32_t;
+typedef unsigned __int32 uint32_t;
+typedef __int64 int64_t;
+typedef unsigned __int64 uint64_t;
 #endif
 
 #include "nstm.h"
@@ -37,18 +48,29 @@
 
 nstm_t *nstm_create(clockid_t clk_id)
 {
-  kern_return_t kstat;
   nstm_t *nstm = (nstm_t *)malloc(sizeof(nstm_t));
   ASSRT(nstm != NULL);
 
   nstm->clk_id = clk_id;
 
 #ifdef __MACH__
+  /* Mac */
   nstm->start_ns = clock_gettime_nsec_np(clk_id);
   nstm->cur_ns = nstm->start_ns;
+  if (clk_id == NSTM_CLOCKID_BEST) {
+    nstm->clk_id = CLOCK_MONOTONIC_RAW;
+  }
+#elif defined(_WIN32)
+  /* Windows */
+  QueryPerformanceFrequency(&nstm->frequency);
+  QueryPerformanceCounter(&nstm->start_ticks);
 #else
+  /* Linux */
   clock_gettime(clk_id, &nstm->start_ts);
   nstm->cur_ns = nstm->start_ts.tv_nsec;
+  if (clk_id == NSTM_CLOCKID_BEST) {
+    nstm->clk_id = CLOCK_MONOTONIC;
+  }
 #endif
 
   return nstm;
@@ -65,10 +87,22 @@ uint64_t nstm_get(nstm_t *nstm)
 {
 #ifdef __MACH__
   nstm->cur_ns = clock_gettime_nsec_np(nstm->clk_id);
+#elif defined(_WIN32)
+  {
+    LARGE_INTEGER ticks;
+    QueryPerformanceCounter(&ticks);
+    nstm->cur_ns = ticks.QuadPart;
+    nstm->cur_ns -= nstm->start_ticks;
+    nstm->cur_ns *= 1000000000;
+    nstm->cur_ns /= nstm->frequency.QuadPart;
+  }
 #else
-  clock_gettime(nstm->clk_id, &nstm->cur_ts);
-  nstm->cur_ns = (uint64_t)(nstm->cur_ts.tv_sec - nstm->start_ts.tv_sec)
-      * UINT64_C(1000000000) + (uint64_t)nstm->cur_ts.tv_nsec;
+  {
+    struct timespec cur_ts;
+    clock_gettime(nstm->clk_id, &cur_ts);
+    nstm->cur_ns = (uint64_t)(cur_ts.tv_sec - nstm->start_ts.tv_sec)
+        * UINT64_C(1000000000) + (uint64_t)cur_ts.tv_nsec;
+  }
 #endif
 
   return nstm->cur_ns;
