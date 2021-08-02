@@ -1,5 +1,5 @@
 /* nstm.h - simple module for nanosecond-level timings.
-# For documentation, see https://github.com/fordsfords/histo_pat
+# For documentation, see https://github.com/fordsfords/nstm
 #
 # This code and its documentation is Copyright 2002-2021 Steven Ford
 # and licensed "public domain" style under Creative Commons "CC0":
@@ -20,9 +20,15 @@ extern "C" {
 #include <inttypes.h>
 
 #include <time.h>
+
 #ifdef __MACH__
+/* Mac */
 #include <mach/clock.h>
 #include <mach/mach.h>
+#elif defined(_WIN32)
+/* Windows */
+#else
+/* Linux */
 #endif
 
 #define NSTM_CLOCKID_BEST -1

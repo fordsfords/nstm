@@ -17,9 +17,12 @@
 #include <time.h>
 
 #ifdef __MACH__
+/* Mac */
 #include <mach/mach.h>
 #include <mach/mach_time.h>
+#define Sleep(ms) usleep((ms)*1000)
 #elif defined(_WIN32)
+/* Windows */
 #include <windows.h>
 /*typedef __int8 int8_t; */
 typedef signed char int8_t;
@@ -30,6 +33,13 @@ typedef __int32 int32_t;
 typedef unsigned __int32 uint32_t;
 typedef __int64 int64_t;
 typedef unsigned __int64 uint64_t;
+typedef int clockid_t;
+#define CLOCK_MONOTONIC 1
+#define CLOCK_MONOTONIC_RAW 2
+#define CLOCK_REALTIME 3
+#else
+/* Linux */
+#define Sleep(ms) usleep((ms)*1000)
 #endif
 
 #include "nstm.h"

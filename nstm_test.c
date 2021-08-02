@@ -10,10 +10,29 @@
 # restrictions.  This work is published from: United States.  The project home
 # is https://github.com/fordsfords/nstm
 */
+
+#ifdef __MACH__
+/* Mac */
+#include <unistd.h>
+#elif defined(_WIN32)
+/* Windows */
+#include <windows.h>
+/*typedef __int8 int8_t; */
+typedef signed char int8_t;
+typedef unsigned __int8 uint8_t;
+typedef __int16 int16_t;
+typedef unsigned __int16 uint16_t;
+typedef __int32 int32_t;
+typedef unsigned __int32 uint32_t;
+typedef __int64 int64_t;
+typedef unsigned __int64 uint64_t;
+#include "nstm.h"
+#else
+/* Linux */
+#include <unistd.h>
+#endif
 #include <stdio.h>
 #include <inttypes.h>
-#include <unistd.h>
-#include "nstm.h"
 
 #define M 10
 #define N (M*1000000)
