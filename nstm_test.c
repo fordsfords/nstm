@@ -26,13 +26,14 @@ typedef __int32 int32_t;
 typedef unsigned __int32 uint32_t;
 typedef __int64 int64_t;
 typedef unsigned __int64 uint64_t;
-#include "nstm.h"
 #else
 /* Linux */
 #include <unistd.h>
 #endif
 #include <stdio.h>
 #include <inttypes.h>
+
+#include "nstm.h"
 
 #define M 10
 #define N (M*1000000)
@@ -106,7 +107,8 @@ int main(int argc, char **argv)
       nstm->start_ns, (intmax_t)nstm->start_ts.tv_sec);
 #endif
 
-  printf("t1==%"PRIu64"\n", t1);
+  printf("t1==%"PRIu64", t1_raw=%"PRIu64", t1_rt=%"PRIu64"\n",
+    t1, t1_raw, t1_rt);
   printf("usleep(100)=%"PRIu64", raw=%"PRIu64", rt=%"PRIu64"\n",
       t2-t1, t2_raw-t1_raw, t2_rt-t1_rt);
   printf("null=%"PRIu64", raw=%"PRIu64", rt=%"PRIu64"\n",
