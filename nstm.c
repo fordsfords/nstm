@@ -1,5 +1,5 @@
 /* nstm.c - simple module for nanosecond-level timings.
-# For documentation, see https://github.com/fordsfords/histo_pat
+# For documentation, see https://github.com/fordsfords/nstm
 #
 # This code and its documentation is Copyright 2021-2021 Steven Ford
 # and licensed "public domain" style under Creative Commons "CC0":
