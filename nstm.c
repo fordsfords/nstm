@@ -84,7 +84,7 @@ nstm_t *nstm_create(int clockid)
       nstm->clockid = CLOCK_REALTIME;
       break;
     case NSTM_CLOCK_BEST:
-      nstm->clockid = CLOCK_MONOTONIC_RAW;
+      nstm->clockid = CLOCK_MONOTONIC;
       break;
     default:
       nstm->clockid = CLOCK_MONOTONIC;
