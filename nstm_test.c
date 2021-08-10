@@ -40,7 +40,7 @@ int main(int argc, char **argv)
   nstm_t *nstm_rt;
   nstm_t *nstm_best;
   int i;
-  uint64_t t1, t2, t3, t4, t5, t6, t7, t_ignore;
+  uint64_t t1, t2, t3, t4, t5, t6, t7;
   uint64_t t1_raw, t2_raw, t3_raw, t4_raw, t5_raw, t6_raw, t7_raw;
   uint64_t t1_rt, t2_rt, t3_rt, t4_rt, t5_rt, t6_rt, t7_rt;
   uint64_t max_histo_diff, min_histo_diff;
@@ -63,28 +63,28 @@ int main(int argc, char **argv)
   t3_rt = nstm_get(nstm_rt);
 
   for (i = 0; i < N; i++) {
-    t_ignore = nstm_get(nstm);
+    (void)nstm_get(nstm);
   }
   t4 = nstm_get(nstm);
   t4_raw = nstm_get(nstm_raw);
   t4_rt = nstm_get(nstm_rt);
 
   for (i = 0; i < N; i++) {
-    t_ignore = nstm_get(nstm_raw);
+    (void)nstm_get(nstm_raw);
   }
   t5 = nstm_get(nstm);
   t5_raw = nstm_get(nstm_raw);
   t5_rt = nstm_get(nstm_rt);
 
   for (i = 0; i < N; i++) {
-    t_ignore = nstm_get(nstm_rt);
+    (void)nstm_get(nstm_rt);
   }
   t6 = nstm_get(nstm);
   t6_raw = nstm_get(nstm_raw);
   t6_rt = nstm_get(nstm_rt);
 
   for (i = 0; i < N; i++) {
-    t_ignore = nstm_get(nstm_best);
+    (void)nstm_get(nstm_best);
   }
   t7 = nstm_get(nstm);
   t7_raw = nstm_get(nstm_raw);
@@ -157,11 +157,11 @@ int main(int argc, char **argv)
         max_histo_diff, min_histo_diff);
   }
 
-  /* Get a series of calls. */
+  /* Get a series of calls that has an outlier. */
   {
     #define SERIES_SZ 100
     uint64_t series[SERIES_SZ];
-    int i;
+    int i, num_tries;
     uint64_t max_series_diff;
 
     /* Warm-up run. */
@@ -170,8 +170,10 @@ int main(int argc, char **argv)
     }
 
     /* Look for a run with pretty big outlier. */
+    num_tries = 0;
     max_series_diff = 0;
     while (max_series_diff < (max_histo_diff / 3)) {
+      num_tries++;
       for (i = 0; i < SERIES_SZ; i++) {
         series[i] = nstm_get(nstm_best);
       }
@@ -185,6 +187,7 @@ int main(int argc, char **argv)
     for (i = 1; i < SERIES_SZ; i++) {
       printf("series diff %d=%"PRIu64"\n", i, series[i] - series[i-1]);
     }
+    printf("num_tries=%d\n", num_tries);
   }
 
   nstm_delete(nstm);
