@@ -109,13 +109,13 @@ int main(int argc, char **argv)
       t2-t1, t2_raw-t1_raw, t2_rt-t1_rt);
   printf("null=%"PRIu64", raw=%"PRIu64", rt=%"PRIu64"\n",
       t3-t2, t3_raw-t2_raw, t3_rt-t2_rt);
-  printf("%dM nstm_get calls=%"PRIu64", raw=%"PRIu64", rt=%"PRIu64"\n",
+  printf("%dM nstm_get(mono) mono=%"PRIu64", raw=%"PRIu64", rt=%"PRIu64"\n",
       M, t4-t3, t4_raw-t3_raw, t4_rt-t3_rt);
-  printf("%dM nstm_get raw calls=%"PRIu64", raw=%"PRIu64", rt=%"PRIu64"\n",
+  printf("%dM nstm_get(raw) mono=%"PRIu64", raw=%"PRIu64", rt=%"PRIu64"\n",
       M, t5-t4, t5_raw-t4_raw, t5_rt-t4_rt);
-  printf("%dM nstm_get rt calls=%"PRIu64", raw=%"PRIu64", rt=%"PRIu64"\n",
+  printf("%dM nstm_get(rt) mono=%"PRIu64", raw=%"PRIu64", rt=%"PRIu64"\n",
       M, t6-t5, t6_raw-t5_raw, t6_rt-t5_rt);
-  printf("%dM nstm_get best calls=%"PRIu64", raw=%"PRIu64", rt=%"PRIu64"\n",
+  printf("%dM nstm_get(best) mono=%"PRIu64", raw=%"PRIu64", rt=%"PRIu64"\n",
       M, t7-t6, t7_raw-t6_raw, t7_rt-t6_rt);
 
   /* Generate histogram of execution times. */
