@@ -2,6 +2,11 @@
 C module to simplify making nanosecond-level timings. Portable across
 Linux, Mac, and Windows.
 
+NOTE: I no longer use this.
+Instead, I use the "cprt" repo at
+https://github.com/fordsfords/cprt
+which includes the portable CPRT_GETTIME().
+
 
 ## Usage
 
